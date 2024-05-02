@@ -47,7 +47,7 @@ int main() {
     sockaddr_in server_address;
     server_address.sin_family = AF_INET;
     server_address.sin_port = htons(12345); // Receiver's port
-    server_address.sin_addr.s_addr = inet_addr("172.27.128.1");
+    server_address.sin_addr.s_addr = inet_addr("183.172.174.94");
 
     // register
     if (connect(client_socket, (sockaddr *)&server_address, sizeof(server_address)) == SOCKET_ERROR)
@@ -57,6 +57,10 @@ int main() {
         WSACleanup();
         return 1;
     }
+    cout << "Enter your name:" << endl;
+    string name;
+    cin >> name;
+    Send_Message(no_response, client_socket, name);
 
     // response for game
     while (true)

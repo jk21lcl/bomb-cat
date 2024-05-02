@@ -64,7 +64,7 @@ void Game::Input()
     while (true)
     {
         Send_Message(response_int, cur_client_, "", 0, cur_player_->GetNumCards());
-        int choice = stoi(Receive_Message(cur_client_));
+        int choice = stoi(Receive_Message(cur_client_).substr(1));
         if (choice == 0)
         {
             Card* card = pile_.back();
@@ -74,11 +74,15 @@ void Game::Input()
             if (card->GetCardType() == bomb)
             {
                 if (DismantleBomb())
+                {
+                    Broadcast(cur_player_->GetName() + " dismantles the bomb.");
                     ReplaceBomb(card);
+                }
                 else 
                 {
                     delete card;
                     cur_player_->SetOut();
+                    Broadcast("The bomb explodes. " + cur_player_->GetName() + " is out.");
                 }
             }
             else
@@ -101,12 +105,11 @@ void Game::Input()
 
 void Game::Start()
 {
-    Broadcast("Game Start!");
+    Broadcast("\r\nGame Start!\r\n");
+    string message = "Players:\r\n";
     for (int i = 0; i < num_players_; i++)
-    {
-        string message = "You are " + players_[i]->GetName() + ".";
-        Send_Message(no_response, clients_[i], message);
-    }
+        message += players_[i]->GetName() + " ";
+    Broadcast(message);
     int round = 0;
     while (CheckGameContinue())
     {
@@ -152,7 +155,7 @@ bool Game::DismantleBomb()
     while (true)
     {
         Send_Message(response_int, cur_client_, "", 0, cur_player_->GetNumCards());
-        int choice = stoi(Receive_Message(cur_client_));
+        int choice = stoi(Receive_Message(cur_client_).substr(1));
         if (choice == 0)
             return false;
         Card* card = cur_player_->GetCards()[choice - 1];
@@ -170,7 +173,7 @@ void Game::ReplaceBomb(Card* card)
 {
     PrivateSend("You can put the bomb back to the pile. Enter the position you want to put it at. 0 for the top.");
     Send_Message(response_int, cur_client_, "", 0, num_pile_);
-    int choice = stoi(Receive_Message(cur_client_));
+    int choice = stoi(Receive_Message(cur_client_).substr(1));
     pile_.emplace(pile_.end() - choice, card);
     num_pile_++;
 }

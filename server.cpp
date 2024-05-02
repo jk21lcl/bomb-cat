@@ -50,6 +50,7 @@ int main()
 
     int num_registered_players = 0;
     vector<SOCKET> clients;
+    vector<string> names;
     while (num_registered_players < num_players)
     {
         SOCKET client_socket = accept(server_socket, nullptr, nullptr);
@@ -60,6 +61,9 @@ int main()
             WSACleanup();
             return 1;
         }
+        cout << "client " << client_socket << " registers." << endl;
+        string name = Receive_Message(client_socket).substr(1);
+        names.push_back(name);
         Send_Message(no_response, client_socket, "Waiting for other players to enter...");
         clients.push_back(client_socket);
         num_registered_players++;
@@ -69,7 +73,7 @@ int main()
     Game game(num_players, clients);
     for (int i = 0; i < num_players; i++)
     {
-        Player* player = new Player("player_" + to_string(i), &game);
+        Player* player = new Player(names[i], &game);
         game.AddPlayer(player);
     }
     game.Start();
