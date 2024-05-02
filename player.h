@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cards.h"
+#include "message.h"
 
 const int NUM_CARD_TYPE = 3;
 
@@ -24,7 +25,7 @@ class Player
 
         bool UseCard(int id);
         void AddCard(Card* card);
-        bool DismantleBomb();
+        void DeleteCard(int id);
     
     private:
         Game* game_;
@@ -44,5 +45,3 @@ class Player
             num_cards_++;
         }
 };
-
-void InputInteger(int m, int n, int* out);

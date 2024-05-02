@@ -24,26 +24,11 @@ void Player::AddCard(Card* card)
     num_cards_++;
 }
 
-bool Player::DismantleBomb()
+void Player::DeleteCard(int id)
 {
-    cout << "You need to dismantle the bomb. Enter the id of the card you want to use. Enter 0 to give up." << endl;
-    while (true)
-    {
-        int choice;
-        InputInteger(0, num_cards_, &choice);
-        if (choice == 0)
-            return false;
-        Card* card = cards_[choice - 1];
-        if (card->GetCardType() == dismantle)
-        {
-            delete card;
-            cards_.erase(cards_.begin() + choice - 1);
-            num_cards_--;
-            return true;
-        }
-        else 
-            cout << "You can not use this card to dismantle the bomb." << endl;
-    }
+    delete cards_[id];
+    cards_.erase(cards_.begin() + id);
+    num_cards_--;
 }
 
 void Player::SetOut()
@@ -73,20 +58,4 @@ void Player::Initialize()
                 cout << "IMPOSSIBLE!!!" << endl;
         }
     }
-}
-
-void InputInteger(int m, int n, int* out)
-{
-    int input;
-    while (true)
-    {
-        cin >> input;
-        if (input < m || input > n)
-        {
-            cout << "Input out of range. Please input again." << endl;
-            continue;
-        }
-        break;
-    }
-    *out = input;
 }

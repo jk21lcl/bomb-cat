@@ -1,7 +1,8 @@
 #include "game.h"
 
-Game::Game(int num_players)
+Game::Game(int num_players, vector<SOCKET> clients)
 {
+    clients_ = clients;
     num_players_ = num_players;
     cur_player_id_ = -1;
     num_pile_ = 0;
@@ -43,36 +44,36 @@ void Game::Initialize()
 
 void Game::ShowStatus() const
 {
-    cout << "There are " << num_pile_ << " cards remain." << endl;
-    cout << "Alive players:" << endl;
+    string message;
+    message += "Alive players:\r\n  ";
     for (Player* player : players_)
         if (player->GetState() == in)
-            cout << player->GetName() << " ";
-    cout << endl;
-    cout << "Your cards:" << endl;
+            message += player->GetName() + " ";
+    message += "\r\n";
+    message += "Your cards:\r\n  "; 
     vector<Card*> cards = cur_player_->GetCards();
     for (int i = 1; i <= cur_player_->GetNumCards(); i++)
-        cout << i << ": " << cards[i - 1]->GetName() << " ";
-    cout << endl;
+        message += to_string(i) + ": " + cards[i - 1]->GetName() + " ";
+    PrivateSend(message);
 }
 
 void Game::Input()
 {
     vector<Card*> cards = cur_player_->GetCards();
-    cout << "Input the id of the card you use. Enter 0 to directly take a card from the top of the pile." << endl;
+    PrivateSend("Input the id of the card you use. Enter 0 to directly take a card from the top of the pile.");
     while (true)
     {
-        int choice;
-        InputInteger(0, cur_player_->GetNumCards(), &choice);
+        Send_Message(response_int, cur_client_, "", 0, cur_player_->GetNumCards());
+        int choice = stoi(Receive_Message(cur_client_));
         if (choice == 0)
         {
             Card* card = pile_.back();
             pile_.pop_back();
             num_pile_--;
-            cout << "You get a " << card->GetName() << "." << endl;
+            Broadcast(cur_player_->GetName() + " get a " + card->GetName() + ".");
             if (card->GetCardType() == bomb)
             {
-                if (cur_player_->DismantleBomb())
+                if (DismantleBomb())
                     ReplaceBomb(card);
                 else 
                 {
@@ -88,9 +89,10 @@ void Game::Input()
         {
             if (cards[choice - 1]->GetCardType() == dismantle)
             {
-                cout << "You can not directly use Dismantle." << endl;
+                PrivateSend("You can not directly use Dismantle.");
                 continue;
             }
+            Broadcast(cur_player_->GetName() + " uses " + cards[choice - 1]->GetName() + ".");
             if (cur_player_->UseCard(choice - 1))
                 break;
         }
@@ -99,19 +101,27 @@ void Game::Input()
 
 void Game::Start()
 {
+    Broadcast("Game Start!");
+    for (int i = 0; i < num_players_; i++)
+    {
+        string message = "You are " + players_[i]->GetName() + ".";
+        Send_Message(no_response, clients_[i], message);
+    }
     int round = 0;
     while (CheckGameContinue())
     {
         round++;
-        cout << "Round: " << round << endl;
+        Broadcast("\r\nRound: " + to_string(round) + "\r\n");
         UpdateCurPlayer();
-        cout << "It's " << cur_player_->GetName() << "'s turn." << endl;
+        Broadcast("It's " + cur_player_->GetName() + "'s turn. There are "+ to_string(num_pile_) + " cards remain.");
         ShowStatus();
         Input();
     }
     for (Player* player : players_)
         if (player->GetState() == in)
-            cout << player->GetName() << " wins!" << endl;
+            Broadcast(player->GetName() + " wins!");
+    for (SOCKET client_socket : clients_)
+        Send_Message(close, client_socket, "");
 }
 
 void Game::UpdateCurPlayer()
@@ -122,6 +132,7 @@ void Game::UpdateCurPlayer()
         cur_player_ = players_[cur_player_id_];
     }
     while (cur_player_->GetState() == out);
+    cur_client_ = clients_[cur_player_id_];
 }
 
 bool Game::CheckGameContinue() const
@@ -135,11 +146,42 @@ bool Game::CheckGameContinue() const
     return false;
 }
 
+bool Game::DismantleBomb()
+{
+    PrivateSend("You need to dismantle the bomb. Enter the id of the card you want to use. Enter 0 to give up.");
+    while (true)
+    {
+        Send_Message(response_int, cur_client_, "", 0, cur_player_->GetNumCards());
+        int choice = stoi(Receive_Message(cur_client_));
+        if (choice == 0)
+            return false;
+        Card* card = cur_player_->GetCards()[choice - 1];
+        if (card->GetCardType() == dismantle)
+        {
+            cur_player_->DeleteCard(choice - 1);
+            return true;
+        }
+        else 
+            PrivateSend("You can not use this card to dismantle the bomb.");
+    }
+}
+
 void Game::ReplaceBomb(Card* card)
 {
-    cout << "You can put the bomb back to the pile. Enter the position you want to put it at. 0 for the top." << endl;
-    int choice;
-    InputInteger(0, num_pile_, &choice);
+    PrivateSend("You can put the bomb back to the pile. Enter the position you want to put it at. 0 for the top.");
+    Send_Message(response_int, cur_client_, "", 0, num_pile_);
+    int choice = stoi(Receive_Message(cur_client_));
     pile_.emplace(pile_.end() - choice, card);
     num_pile_++;
+}
+
+void Game::Broadcast(string content) const
+{
+    for (SOCKET client_socket : clients_)
+        Send_Message(no_response, client_socket, content);
+}
+
+void Game::PrivateSend(string content) const
+{
+    Send_Message(no_response, cur_client_, content);
 }
