@@ -28,18 +28,19 @@ bool ResponseMessage(SOCKET socket)
 }
 
 int main() {
+    cout << "Welcome to the client!" << endl;
     // client setup
     WSADATA wsa_data;
     if (WSAStartup(MAKEWORD(2, 2), &wsa_data) != 0)
     {
-        std::cerr << "Error: WSAStartup failed" << std::endl;
+        std::cout << "Error: WSAStartup failed" << std::endl;
         return 1;
     }
 
     SOCKET client_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (client_socket == INVALID_SOCKET)
     {
-        std::cerr << "Error: Could not create socket" << std::endl;
+        std::cout << "Error: Could not create socket" << std::endl;
         WSACleanup();
         return 1;
     }
@@ -52,7 +53,7 @@ int main() {
     // register
     if (connect(client_socket, (sockaddr *)&server_address, sizeof(server_address)) == SOCKET_ERROR)
     {
-        std::cerr << "Error: Could not connect to server" << std::endl;
+        std::cout << "Error: Could not connect to server" << std::endl;
         closesocket(client_socket);
         WSACleanup();
         return 1;

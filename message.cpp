@@ -28,7 +28,7 @@ void Send_Message(MessageType type, SOCKET socket, string content, int low, int 
     string message = head + content;
     if (send(socket, message.c_str(), message.length(), 0) == SOCKET_ERROR)
     {
-        std::cerr << "Error: Failed to send message" << std::endl;
+        std::cout << "Error: Failed to send message" << std::endl;
         exit(1);
     }
     Sleep(10); // wait for 10 millisecond to avoid concatenation of messages
@@ -40,7 +40,7 @@ string Receive_Message(SOCKET socket)
     int bytes_received = recv(socket, message, sizeof(message), 0);
     if (bytes_received <= 0)
     {
-        std::cerr << "Error: Failed to receive message" << std::endl;
+        std::cout << "Error: Failed to receive message" << std::endl;
         exit(1);
     }
     return string(message, bytes_received);

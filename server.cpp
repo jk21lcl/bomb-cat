@@ -3,19 +3,20 @@
 int main()
 {
     srand(time(nullptr));
+    cout << "Welcome to the server!" << endl;
 
     // server setup
     WSADATA wsa_data;
     if (WSAStartup(MAKEWORD(2, 2), &wsa_data) != 0)
     {
-        std::cerr << "Error: WSAStartup failed" << std::endl;
+        std::cout << "Error: WSAStartup failed" << std::endl;
         return 1;
     }
 
     SOCKET server_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (server_socket == INVALID_SOCKET)
     {
-        std::cerr << "Error: Could not create socket" << std::endl;
+        std::cout << "Error: Could not create socket" << std::endl;
         WSACleanup();
         return 1;
     }
@@ -27,7 +28,7 @@ int main()
 
     if (bind(server_socket, (sockaddr *)&server_address, sizeof(server_address)) == SOCKET_ERROR)
     {
-        std::cerr << "Error: Could not bind to port" << std::endl;
+        std::cout << "Error: Could not bind to port" << std::endl;
         closesocket(server_socket);
         WSACleanup();
         return 1;
@@ -35,7 +36,7 @@ int main()
 
     if (listen(server_socket, 1) == SOCKET_ERROR)
     {
-        std::cerr << "Error: Could not listen on socket" << std::endl;
+        std::cout << "Error: Could not listen on socket" << std::endl;
         closesocket(server_socket);
         WSACleanup();
         return 1;
@@ -56,7 +57,7 @@ int main()
         SOCKET client_socket = accept(server_socket, nullptr, nullptr);
         if (client_socket == INVALID_SOCKET)
         {
-            std::cerr << "Error: Could not accept connection" << std::endl;
+            std::cout << "Error: Could not accept connection" << std::endl;
             closesocket(server_socket);
             WSACleanup();
             return 1;
