@@ -31,6 +31,7 @@ class Game
         void ReplaceBomb(Card* card);
         void Broadcast(string content) const; // send no-response message to all players
         void PrivateSend(string content) const; // send no-response message to current player
+        void OthersSend(string content) const; // send no-response message to other players
 
         template<typename T>
         void DynamicAddCard()

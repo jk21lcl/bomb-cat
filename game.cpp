@@ -48,8 +48,7 @@ void Game::ShowStatus() const
     message += "Alive players:\r\n  ";
     for (Player* player : players_)
         if (player->GetState() == in)
-            message += player->GetName() + " ";
-    message += "\r\n";
+            message += player->GetName() + ": " + to_string(player->GetNumCards()) + " cards.\r\n";
     message += "Your cards:\r\n  "; 
     vector<Card*> cards = cur_player_->GetCards();
     for (int i = 1; i <= cur_player_->GetNumCards(); i++)
@@ -70,9 +69,10 @@ void Game::Input()
             Card* card = pile_.back();
             pile_.pop_back();
             num_pile_--;
-            Broadcast(cur_player_->GetName() + " get a " + card->GetName() + ".");
+            PrivateSend("You get a " + card->GetName() + ".");
             if (card->GetCardType() == bomb)
             {
+                OthersSend(cur_player_->GetName() + " get a bomb.");
                 if (DismantleBomb())
                 {
                     Broadcast(cur_player_->GetName() + " dismantles the bomb.");
@@ -86,7 +86,10 @@ void Game::Input()
                 }
             }
             else
+            {
+                OthersSend(cur_player_->GetName() + " get a card.");
                 cur_player_->AddCard(card);
+            }
             break;
         }
         else
@@ -187,4 +190,11 @@ void Game::Broadcast(string content) const
 void Game::PrivateSend(string content) const
 {
     Send_Message(no_response, cur_client_, content);
+}
+
+void Game::OthersSend(string content) const
+{
+    for (SOCKET client_socket : clients_)
+        if (client_socket != cur_client_)
+            Send_Message(no_response, cur_client_, content);
 }

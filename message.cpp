@@ -31,7 +31,7 @@ void Send_Message(MessageType type, SOCKET socket, string content, int low, int 
         std::cout << "Error: Failed to send message" << std::endl;
         exit(1);
     }
-    Sleep(10); // wait for 10 millisecond to avoid concatenation of messages
+    Sleep(100); // wait for 10 millisecond to avoid concatenation of messages
 }
 
 string Receive_Message(SOCKET socket)
