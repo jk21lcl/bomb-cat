@@ -45,10 +45,10 @@ void Game::Initialize()
 void Game::ShowStatus() const
 {
     string message;
-    message += "Alive players:\r\n  ";
+    message += "Alive players:\r\n";
     for (Player* player : players_)
         if (player->GetState() == in)
-            message += player->GetName() + ": " + to_string(player->GetNumCards()) + " cards.\r\n";
+            message += "  " + player->GetName() + ": " + to_string(player->GetNumCards()) + " cards\r\n";
     message += "Your cards:\r\n  "; 
     vector<Card*> cards = cur_player_->GetCards();
     for (int i = 1; i <= cur_player_->GetNumCards(); i++)
@@ -72,7 +72,7 @@ void Game::Input()
             PrivateSend("You get a " + card->GetName() + ".");
             if (card->GetCardType() == bomb)
             {
-                OthersSend(cur_player_->GetName() + " get a bomb.");
+                OthersSend(cur_player_->GetName() + " gets a bomb.");
                 if (DismantleBomb())
                 {
                     Broadcast(cur_player_->GetName() + " dismantles the bomb.");
@@ -87,7 +87,7 @@ void Game::Input()
             }
             else
             {
-                OthersSend(cur_player_->GetName() + " get a card.");
+                OthersSend(cur_player_->GetName() + " gets a card.");
                 cur_player_->AddCard(card);
             }
             break;
@@ -99,7 +99,8 @@ void Game::Input()
                 PrivateSend("You can not directly use Dismantle.");
                 continue;
             }
-            Broadcast(cur_player_->GetName() + " uses " + cards[choice - 1]->GetName() + ".");
+            PrivateSend("You use " + cards[choice - 1]->GetName() + ".");
+            OthersSend(cur_player_->GetName() + " uses " + cards[choice - 1]->GetName() + ".");
             if (cur_player_->UseCard(choice - 1))
                 break;
         }
@@ -119,7 +120,9 @@ void Game::Start()
         round++;
         Broadcast("\r\nRound: " + to_string(round) + "\r\n");
         UpdateCurPlayer();
-        Broadcast("It's " + cur_player_->GetName() + "'s turn. There are "+ to_string(num_pile_) + " cards remain.");
+        OthersSend("It's " + cur_player_->GetName() + "'s turn. ");
+        PrivateSend("It's your turn. ");
+        Broadcast("There are "+ to_string(num_pile_) + " cards remain.");
         ShowStatus();
         Input();
     }
@@ -196,5 +199,5 @@ void Game::OthersSend(string content) const
 {
     for (SOCKET client_socket : clients_)
         if (client_socket != cur_client_)
-            Send_Message(no_response, cur_client_, content);
+            Send_Message(no_response, client_socket, content);
 }

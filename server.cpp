@@ -1,5 +1,16 @@
 #include "game.h"
 
+vector<SOCKET> clients;
+vector<string> names;
+
+bool CheckNameValid(string name)
+{
+    for (string existing_name : names)
+        if (name == existing_name)
+            return false;
+    return true;
+}
+
 int main()
 {
     srand(time(nullptr));
@@ -50,8 +61,6 @@ int main()
     InputInteger(2, 10, &num_players);
 
     int num_registered_players = 0;
-    vector<SOCKET> clients;
-    vector<string> names;
     while (num_registered_players < num_players)
     {
         SOCKET client_socket = accept(server_socket, nullptr, nullptr);
@@ -63,8 +72,20 @@ int main()
             return 1;
         }
         cout << "client " << client_socket << " registers." << endl;
-        string name = Receive_Message(client_socket).substr(1);
-        names.push_back(name);
+
+        // add name
+        Send_Message(response_str, client_socket, "Input your name:");
+        while (true)
+        {
+            string name = Receive_Message(client_socket).substr(1);
+            if (CheckNameValid(name))
+            {
+                names.push_back(name);
+                break;
+            }
+            Send_Message(response_str, client_socket, "The name exists. Please input again.");
+        }
+
         Send_Message(no_response, client_socket, "Waiting for other players to enter...");
         clients.push_back(client_socket);
         num_registered_players++;

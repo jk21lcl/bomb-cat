@@ -21,6 +21,14 @@ bool ResponseMessage(SOCKET socket)
         }
         case close:
             return true;
+        case response_str:
+        {
+            cout << message.substr(1) << endl;
+            string input;
+            cin >> input;
+            Send_Message(no_response, socket, input);
+            return false;
+        }
         default:
             cout << "IMPOSSIBLE!" << endl;
             return false;
@@ -58,10 +66,6 @@ int main() {
         WSACleanup();
         return 1;
     }
-    cout << "Enter your name:" << endl;
-    string name;
-    cin >> name;
-    Send_Message(no_response, client_socket, name);
 
     // response for game
     while (true)

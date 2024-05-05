@@ -11,7 +11,8 @@ enum MessageType
 {
     no_response, // output the content
     response_int, // the 2nd/3rd char encodes the lower/upper bound, no output
-    close // close the socket, no output
+    close, // close the socket, no output
+    response_str // output the content and input a string
 };
 
 void InputInteger(int m, int n, int* out);
