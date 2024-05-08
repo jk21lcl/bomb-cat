@@ -17,29 +17,12 @@ void Message::Send(SOCKET socket) const
     head.push_back(low + '0');
     head.push_back(high + '0');
     string message = head + content;
+    message.push_back('$');
     if (send(socket, message.c_str(), message.length(), 0) == SOCKET_ERROR)
     {
         std::cout << "Error: Failed to send message" << std::endl;
         exit(1);
     }
-    Sleep(100); // wait for some millisecond to avoid concatenation of messages
-}
-
-void Message::Receive(SOCKET socket)
-{
-    char message[1024];
-    int bytes_received = recv(socket, message, sizeof(message), 0);
-    if (bytes_received <= 0)
-    {
-        std::cout << "Error: Failed to receive message" << std::endl;
-        exit(1);
-    }
-    string s(message, bytes_received);
-    type = MessageType(s[0] - '0');
-    color = Color(s[1] - '0');
-    low = s[2] - '0';
-    high = s[3] - '0';
-    content = s.substr(4);
 }
 
 void InputInteger(int m, int n, int* out)
@@ -98,4 +81,37 @@ void OutputColor(string content, Color color)
             cout << "IMPOSSBLE!" << endl;
     }
     cout << content << "\e[0m" << endl;
+}
+
+vector<Message> ReceiveMessage(SOCKET socket)
+{
+    char message[1024];
+    int bytes_received = recv(socket, message, sizeof(message), 0);
+    if (bytes_received <= 0)
+    {
+        std::cout << "Error: Failed to receive message" << std::endl;
+        exit(1);
+    }
+    string raw_message(message, bytes_received);
+
+    vector<string> result;
+    size_t start = 0;
+    size_t end = 0;
+    while ((end = raw_message.find('$', start)) != string::npos)
+    {
+        result.push_back(raw_message.substr(start, end - start));
+        start = end + 1;
+    }
+
+    vector<Message> messages;
+    for (string message : result)
+    {
+        MessageType type = MessageType(message[0] - '0');
+        Color color = Color(message[1] - '0');
+        int low = message[2] - '0';
+        int high = message[3] - '0';
+        string content = message.substr(4);
+        messages.push_back(Message(type, content, color, low, high));
+    }
+    return messages;
 }

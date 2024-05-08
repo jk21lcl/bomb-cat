@@ -133,8 +133,7 @@ void Game::Start()
             Broadcast(player->GetName() + " wins!");
     for (SOCKET client_socket : clients_)
     {
-        Message close_message(close);
-        close_message.Send(client_socket);
+        Message(close).Send(client_socket);
     }
 }
 
@@ -199,17 +198,13 @@ void Game::Broadcast(string content, Color color) const
 
 void Game::PrivateSend(string content, Color color) const
 {
-    Message message(no_response, content, color);
-    message.Send(cur_client_);
+    Message(no_response, content, color).Send(cur_client_);
 }
 
 int Game::PrivateSendInt(string content, int low, int high, Color color) const
 {
-    Message send_message(response_int, content, color, low, high);
-    send_message.Send(cur_client_);
-    Message receive_message;
-    receive_message.Receive(cur_client_);
-    return stoi(receive_message.content);
+    Message(response_int, content, color, low, high).Send(cur_client_);
+    return stoi(ReceiveMessage(cur_client_)[0].content);
 }
 
 void Game::OthersSend(string content, Color color) const
@@ -229,6 +224,5 @@ void Game::ShowPlayerCards(int id) const
     vector<Card*> cards = player->GetCards();
     for (int i = 1; i <= player->GetNumCards(); i++)
         message += to_string(i) + ": " + cards[i - 1]->GetName() + " ";
-    Message send_message(no_response, message);
-    send_message.Send(client);
+    Message(no_response, message).Send(client);
 }

@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 #include <winsock2.h>
 
 using namespace std;
@@ -33,6 +34,7 @@ class Message
 {
     public:
         // 1st encodes type, 2nd encodes color, 3rd/4th encodes low/high
+        // tail bit $ as delimiter
         MessageType type;
         Color color;
         int low; // the lower bound of response integer
@@ -43,8 +45,9 @@ class Message
         ~Message() {}
 
         void Send(SOCKET socket) const;
-        void Receive(SOCKET socket);
 };
 
 void InputInteger(int m, int n, int* out);
 void OutputColor(string content, Color color);
+
+vector<Message> ReceiveMessage(SOCKET socket);

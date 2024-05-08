@@ -3,37 +3,36 @@
 // return true if game ends
 bool ResponseMessage(SOCKET socket)
 {
-    Message message;
-    message.Receive(socket);
-    switch (message.type)
-    {
-        case no_response:
-            OutputColor(message.content, message.color);
-            return false;
-        case response_int:
+    vector<Message> messages = ReceiveMessage(socket);
+    for (Message message : messages)
+        switch (message.type)
         {
-            OutputColor(message.content, message.color);
-            int input;
-            InputInteger(message.low, message.high, &input);
-            Message sending_message(no_response, to_string(input));
-            sending_message.Send(socket);
-            return false;
+            case no_response:
+                OutputColor(message.content, message.color);
+                break;
+            case response_int:
+            {
+                OutputColor(message.content, message.color);
+                int input;
+                InputInteger(message.low, message.high, &input);
+                Message(no_response, to_string(input)).Send(socket);
+                break;
+            }
+            case response_str:
+            {
+                OutputColor(message.content, message.color);
+                string input;
+                cin >> input;
+                Message(no_response, input).Send(socket);
+                break;
+            }
+            case close:
+                return true;
+            default:
+                cout << "IMPOSSIBLE!" << endl;
+                break;
         }
-        case response_str:
-        {
-            OutputColor(message.content, message.color);
-            string input;
-            cin >> input;
-            Message sending_message(no_response, input);
-            sending_message.Send(socket);
-            return false;
-        }
-        case close:
-            return true;
-        default:
-            cout << "IMPOSSIBLE!" << endl;
-            return false;
-    }
+    return false;
 }
 
 int main() {

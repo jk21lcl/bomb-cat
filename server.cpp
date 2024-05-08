@@ -74,23 +74,19 @@ int main()
         cout << "client " << client_socket << " registers." << endl;
 
         // add name
-        Message add_name(response_str, "Input your name:");
-        add_name.Send(client_socket);
+        Message(response_str, "Input your name:").Send(client_socket);
         while (true)
         {
-            Message receive_name;
-            receive_name.Receive(client_socket);
-            if (CheckNameValid(receive_name.content))
+            string name = ReceiveMessage(client_socket)[0].content;
+            if (CheckNameValid(name))
             {
-                names.push_back(receive_name.content);
+                names.push_back(name);
                 break;
             }
-            Message existing_name(response_str, "The name exists. Please input again.");
-            existing_name.Send(client_socket);
+            Message(response_str, "The name exists. Please input again.").Send(client_socket);
         }
 
-        Message waiting_message(no_response, "Waiting for other players to enter...");
-        waiting_message.Send(client_socket);
+        Message(no_response, "Waiting for other players to enter...").Send(client_socket);
         clients.push_back(client_socket);
         num_registered_players++;
     }

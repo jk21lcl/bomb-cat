@@ -44,8 +44,7 @@ bool Despoil::Use()
             game_->GetCurPlayer()->AddCard(card);
             target_player->RemoveCard(target);
             game_->PrivateSend("You get a " + card->GetName() + ".", light_blue);
-            Message send_message_2(no_response, "Your " + card->GetName() + " is despoiled.", light_yellow);
-            send_message_2.Send(target_client);
+            Message(no_response, "Your " + card->GetName() + " is despoiled.", light_yellow).Send(target_client);
             game_->ShowPlayerCards(choice - 1);
             break;
         }
