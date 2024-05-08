@@ -9,7 +9,8 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}"
 
 add_library(bomb_cat game.cpp player.cpp card.cpp message.cpp
             
-            cards/bomb.cpp cards/dismantle.cpp cards/rest.cpp)
+            cards/bomb.cpp cards/dismantle.cpp cards/rest.cpp
+            cards/despoil.cpp)
 
 add_executable(server_start server.cpp)
 target_link_libraries(server_start bomb_cat ws2_32)

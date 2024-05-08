@@ -13,10 +13,12 @@ enum CardType
 {
     bomb,
     dismantle,
-    rest
+    rest,
+    despoil
 };
 
 class Game;
+class Player;
 
 class Card
 {

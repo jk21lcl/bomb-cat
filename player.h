@@ -3,7 +3,7 @@
 #include "cards.h"
 #include "message.h"
 
-const int NUM_CARD_TYPE = 3;
+const int NUM_CARD_TYPE = 4;
 
 enum PlayerState
 {
@@ -26,6 +26,7 @@ class Player
         bool UseCard(int id);
         void AddCard(Card* card);
         void DeleteCard(int id);
+        void RemoveCard(int id);
     
     private:
         Game* game_;

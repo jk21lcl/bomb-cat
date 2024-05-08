@@ -12,6 +12,7 @@ bool ResponseMessage(SOCKET socket)
             return false;
         case response_int:
         {
+            OutputColor(message.content, message.color);
             int input;
             InputInteger(message.low, message.high, &input);
             Message sending_message(no_response, to_string(input));

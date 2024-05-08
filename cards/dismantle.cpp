@@ -1,4 +1,4 @@
-#include "dismantle.h"
+#include "game.h"
 
 Dismantle::Dismantle(Game* game) : Card(game)
 {

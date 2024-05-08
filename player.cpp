@@ -31,6 +31,12 @@ void Player::DeleteCard(int id)
     num_cards_--;
 }
 
+void Player::RemoveCard(int id)
+{
+    cards_.erase(cards_.begin() + id);
+    num_cards_--;
+}
+
 void Player::SetOut()
 {
     state_ = out;
@@ -53,6 +59,9 @@ void Player::Initialize()
                 break;
             case 2:
                 DynamicAddCard<Rest>();
+                break;
+            case 3:
+                DynamicAddCard<Despoil>();
                 break;
             default:
                 cout << "IMPOSSIBLE!!!" << endl;

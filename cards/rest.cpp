@@ -1,4 +1,4 @@
-#include "rest.h"
+#include "game.h"
 
 Rest::Rest(Game* game) : Card(game)
 {
@@ -8,5 +8,7 @@ Rest::Rest(Game* game) : Card(game)
 
 bool Rest::Use()
 {
+    game_->PrivateSend("You use rest.");
+    game_->OthersSend(game_->GetCurPlayer()->GetName() + "uses rest.");
     return true;
 }

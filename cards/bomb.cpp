@@ -1,4 +1,4 @@
-#include "bomb.h"
+#include "game.h"
 
 Bomb::Bomb(Game* game) : Card(game)
 {

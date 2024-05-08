@@ -9,7 +9,7 @@ using namespace std;
 enum MessageType
 {
     no_response, // output the content
-    response_int, // no output and input an integer
+    response_int, // output the content and input an integer
     response_str, // output the content and input a string
     close // close the socket, no output
 };

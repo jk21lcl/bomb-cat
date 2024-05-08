@@ -22,7 +22,7 @@ void Message::Send(SOCKET socket) const
         std::cout << "Error: Failed to send message" << std::endl;
         exit(1);
     }
-    Sleep(100); // wait for 10 millisecond to avoid concatenation of messages
+    Sleep(100); // wait for some millisecond to avoid concatenation of messages
 }
 
 void Message::Receive(SOCKET socket)
@@ -40,8 +40,6 @@ void Message::Receive(SOCKET socket)
     low = s[2] - '0';
     high = s[3] - '0';
     content = s.substr(4);
-
-    Sleep(10);
 }
 
 void InputInteger(int m, int n, int* out)
