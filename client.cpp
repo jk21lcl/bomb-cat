@@ -3,32 +3,32 @@
 // return true if game ends
 bool ResponseMessage(SOCKET socket)
 {
-    string message = Receive_Message(socket);
-    MessageType type = (MessageType)(message[0] - '0');
-    switch (type)
+    Message message;
+    message.Receive(socket);
+    switch (message.type)
     {
         case no_response:
-            cout << message.substr(1) << endl;
+            OutputColor(message.content, message.color);
             return false;
         case response_int:
         {
-            int low = message[1] - '0';
-            int high = message[2] - '0';
             int input;
-            InputInteger(low, high, &input);
-            Send_Message(no_response, socket, to_string(input));
+            InputInteger(message.low, message.high, &input);
+            Message sending_message(no_response, to_string(input));
+            sending_message.Send(socket);
+            return false;
+        }
+        case response_str:
+        {
+            OutputColor(message.content, message.color);
+            string input;
+            cin >> input;
+            Message sending_message(no_response, input);
+            sending_message.Send(socket);
             return false;
         }
         case close:
             return true;
-        case response_str:
-        {
-            cout << message.substr(1) << endl;
-            string input;
-            cin >> input;
-            Send_Message(no_response, socket, input);
-            return false;
-        }
         default:
             cout << "IMPOSSIBLE!" << endl;
             return false;

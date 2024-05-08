@@ -62,8 +62,11 @@ void Game::Input()
     PrivateSend("Input the id of the card you use. Enter 0 to directly take a card from the top of the pile.");
     while (true)
     {
-        Send_Message(response_int, cur_client_, "", 0, cur_player_->GetNumCards());
-        int choice = stoi(Receive_Message(cur_client_).substr(1));
+        Message send_message(response_int, "", white, 0, cur_player_->GetNumCards());
+        send_message.Send(cur_client_);
+        Message receive_message;
+        receive_message.Receive(cur_client_);
+        int choice = stoi(receive_message.content);
         if (choice == 0)
         {
             Card* card = pile_.back();
@@ -110,7 +113,7 @@ void Game::Input()
 void Game::Start()
 {
     Broadcast("\r\nGame Start!\r\n");
-    string message = "Players:\r\n";
+    string message = "Players:  ";
     for (int i = 0; i < num_players_; i++)
         message += players_[i]->GetName() + " ";
     Broadcast(message);
@@ -130,7 +133,10 @@ void Game::Start()
         if (player->GetState() == in)
             Broadcast(player->GetName() + " wins!");
     for (SOCKET client_socket : clients_)
-        Send_Message(close, client_socket, "");
+    {
+        Message close_message(close);
+        close_message.Send(client_socket);
+    }
 }
 
 void Game::UpdateCurPlayer()
@@ -160,8 +166,11 @@ bool Game::DismantleBomb()
     PrivateSend("You need to dismantle the bomb. Enter the id of the card you want to use. Enter 0 to give up.");
     while (true)
     {
-        Send_Message(response_int, cur_client_, "", 0, cur_player_->GetNumCards());
-        int choice = stoi(Receive_Message(cur_client_).substr(1));
+        Message send_message(response_int, "", white, 0, cur_player_->GetNumCards());
+        send_message.Send(cur_client_);
+        Message receive_message;
+        receive_message.Receive(cur_client_);
+        int choice = stoi(receive_message.content);
         if (choice == 0)
             return false;
         Card* card = cur_player_->GetCards()[choice - 1];
@@ -178,26 +187,32 @@ bool Game::DismantleBomb()
 void Game::ReplaceBomb(Card* card)
 {
     PrivateSend("You can put the bomb back to the pile. Enter the position you want to put it at. 0 for the top.");
-    Send_Message(response_int, cur_client_, "", 0, num_pile_);
-    int choice = stoi(Receive_Message(cur_client_).substr(1));
+    Message send_message(response_int, "", white, 0, num_pile_);
+    send_message.Send(cur_client_);
+    Message receive_message;
+    receive_message.Receive(cur_client_);
+    int choice = stoi(receive_message.content);
     pile_.emplace(pile_.end() - choice, card);
     num_pile_++;
 }
 
-void Game::Broadcast(string content) const
+void Game::Broadcast(string content, Color color) const
 {
+    Message message(no_response, content, color);
     for (SOCKET client_socket : clients_)
-        Send_Message(no_response, client_socket, content);
+        message.Send(client_socket);
 }
 
-void Game::PrivateSend(string content) const
+void Game::PrivateSend(string content, Color color) const
 {
-    Send_Message(no_response, cur_client_, content);
+    Message message(no_response, content, color);
+    message.Send(cur_client_);
 }
 
-void Game::OthersSend(string content) const
+void Game::OthersSend(string content, Color color) const
 {
+    Message message(no_response, content, color);
     for (SOCKET client_socket : clients_)
         if (client_socket != cur_client_)
-            Send_Message(no_response, client_socket, content);
+            message.Send(client_socket);
 }
