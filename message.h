@@ -27,7 +27,9 @@ enum Color
     dark_blue,
     light_blue,
     dark_pink,
-    light_pink
+    light_pink,
+    dark_cyan,
+    light_cyan
 };
 
 class Message

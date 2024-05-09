@@ -2,3 +2,6 @@
 #include "dismantle.h"
 #include "rest.h"
 #include "despoil.h"
+#include "shuffle.h"
+#include "detect.h"
+#include "bottom.h"

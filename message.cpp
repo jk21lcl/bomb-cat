@@ -77,6 +77,12 @@ void OutputColor(string content, Color color)
         case light_pink:
             cout << "\e[1;35m";
             break;
+        case dark_cyan:
+            cout << "\e[0;36m";
+            break;
+        case light_cyan:
+            cout << "\e[1;36m";
+            break;
         default:
             cout << "IMPOSSBLE!" << endl;
     }

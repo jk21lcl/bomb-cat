@@ -14,7 +14,10 @@ enum CardType
     bomb,
     dismantle,
     rest,
-    despoil
+    despoil,
+    shuffle,
+    detect,
+    bottom
 };
 
 class Game;

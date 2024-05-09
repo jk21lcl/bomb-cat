@@ -38,11 +38,20 @@ void Game::Initialize()
             case 3:
                 DynamicAddCard<Despoil>();
                 break;
+            case 4:
+                DynamicAddCard<Shuffle>();
+                break;
+            case 5:
+                DynamicAddCard<Detect>();
+                break;
+            case 6:
+                DynamicAddCard<Bottom>();
+                break;
             default:
                 cout << "IMPOSSIBLE!!!" << endl;
         }
     }
-    random_shuffle(pile_.begin(), pile_.end());
+    ShuffleDeck();
 }
 
 void Game::ShowStatus() const
@@ -70,31 +79,7 @@ void Game::Input()
         int choice = PrivateSendInt(message, 0, cur_player_->GetNumCards());
         if (choice == 0)
         {
-            Card* card = pile_.back();
-            pile_.pop_back();
-            num_pile_--;
-            if (card->GetCardType() == bomb)
-            {
-                PrivateSend("You get a bomb.", light_red);
-                OthersSend(cur_player_->GetName() + " gets a bomb.", light_red);
-                if (DismantleBomb())
-                {
-                    Broadcast(cur_player_->GetName() + " dismantles the bomb.", light_green);
-                    ReplaceBomb(card);
-                }
-                else 
-                {
-                    delete card;
-                    cur_player_->SetOut();
-                    Broadcast("The bomb explodes. " + cur_player_->GetName() + " is out.", dark_red);
-                }
-            }
-            else
-            {
-                PrivateSend("You get a " + card->GetName() + ".", light_blue);
-                OthersSend(cur_player_->GetName() + " gets a card.", light_blue);
-                cur_player_->AddCard(card);
-            }
+            PlayerGetCard(num_pile_ - 1);
             break;
         }
         else
@@ -225,4 +210,38 @@ void Game::ShowPlayerCards(int id) const
     for (int i = 1; i <= player->GetNumCards(); i++)
         message += to_string(i) + ": " + cards[i - 1]->GetName() + " ";
     Message(no_response, message).Send(client);
+}
+
+void Game::ShuffleDeck()
+{
+    random_shuffle(pile_.begin(), pile_.end());
+}
+
+void Game::PlayerGetCard(int id)
+{
+    Card* card = pile_[id];
+    pile_.erase(pile_.begin() + id);
+    num_pile_--;
+    if (card->GetCardType() == bomb)
+    {
+        PrivateSend("You get a bomb.", light_red);
+        OthersSend(cur_player_->GetName() + " gets a bomb.", light_red);
+        if (DismantleBomb())
+        {
+            Broadcast(cur_player_->GetName() + " dismantles the bomb.", light_green);
+            ReplaceBomb(card);
+        }
+        else 
+        {
+            delete card;
+            cur_player_->SetOut();
+            Broadcast("The bomb explodes. " + cur_player_->GetName() + " is out.", dark_red);
+        }
+    }
+    else
+    {
+        PrivateSend("You get a " + card->GetName() + ".", light_blue);
+        OthersSend(cur_player_->GetName() + " gets a card.", light_blue);
+        cur_player_->AddCard(card);
+    }
 }

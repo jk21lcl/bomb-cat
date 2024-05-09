@@ -28,8 +28,8 @@ bool Despoil::Use()
             continue;
         }
 
-        game_->PrivateSend("You use despoil. Target: " + to_string(choice));
-        game_->OthersSend(game_->GetCurPlayer()->GetName() + " uses despoil. Target: " + to_string(choice));
+        game_->PrivateSend("You use despoil. Target: " + to_string(choice), light_cyan);
+        game_->OthersSend(game_->GetCurPlayer()->GetName() + " uses despoil. Target: " + to_string(choice), light_cyan);
 
         int num_target_cards = target_player->GetNumCards();
         if (num_target_cards == 0)

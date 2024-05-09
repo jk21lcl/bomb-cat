@@ -3,7 +3,7 @@
 #include "cards.h"
 #include "message.h"
 
-const int NUM_CARD_TYPE = 4;
+const int NUM_CARD_TYPE = 7;
 
 enum PlayerState
 {

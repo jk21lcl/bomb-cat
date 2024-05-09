@@ -12,9 +12,12 @@ Player::Player(string name, Game* game)
 bool Player::UseCard(int id)
 {
     bool skip = cards_[id]->Use();
-    delete cards_[id];
-    cards_.erase(cards_.begin() + id);
-    num_cards_--;
+    if (state_ == in)
+    {
+        delete cards_[id];
+        cards_.erase(cards_.begin() + id);
+        num_cards_--;
+    }
     return skip;
 }
 
@@ -62,6 +65,15 @@ void Player::Initialize()
                 break;
             case 3:
                 DynamicAddCard<Despoil>();
+                break;
+            case 4:
+                DynamicAddCard<Shuffle>();
+                break;
+            case 5:
+                DynamicAddCard<Detect>();
+                break;
+            case 6:
+                DynamicAddCard<Bottom>();
                 break;
             default:
                 cout << "IMPOSSIBLE!!!" << endl;

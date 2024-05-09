@@ -11,6 +11,8 @@ class Game
         void AddPlayer(Player* player);
         void Start();
         void ShowPlayerCards(int id) const;
+        void ShuffleDeck();
+        void PlayerGetCard(int id);
 
         void Broadcast(string content, Color color = white) const; // send no-response message to all players
         void PrivateSend(string content, Color color = white) const; // send no-response message to current player
@@ -23,6 +25,8 @@ class Game
         int GetCurPlayerId() const { return cur_player_id_; }
         Player* GetCurPlayer() const { return cur_player_; }
         SOCKET GetCurClient() const { return cur_client_; }
+        int GetNumPile() const { return num_pile_; }
+        vector<Card*> GetPile() const { return pile_; }
 
     private:
         int num_players_;
