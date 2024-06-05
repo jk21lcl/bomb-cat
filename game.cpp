@@ -71,9 +71,9 @@ void Game::ShowStatus() const
 
 void Game::Input()
 {
-    vector<Card*> cards = cur_player_->GetCards();
     while (true)
     {
+        vector<Card*> cards = cur_player_->GetCards();
         ShowPlayerCards(cur_player_id_);
         string message = "Input the id of the card you use. Enter 0 to directly take a card from the top of the pile.";
         int choice = PrivateSendInt(message, 0, cur_player_->GetNumCards());

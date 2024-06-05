@@ -56,7 +56,7 @@ int main() {
     sockaddr_in server_address;
     server_address.sin_family = AF_INET;
     server_address.sin_port = htons(12345); // Receiver's port
-    server_address.sin_addr.s_addr = inet_addr("183.172.174.94");
+    server_address.sin_addr.s_addr = inet_addr("183.172.168.143");
 
     // register
     if (connect(client_socket, (sockaddr *)&server_address, sizeof(server_address)) == SOCKET_ERROR)
